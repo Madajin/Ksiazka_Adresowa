@@ -1,0 +1,432 @@
+#include <iostream>
+#include <windows.h>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+struct Przyjaciel {
+    int idPrzyjaciela = 0;
+    string imie = "", nazwisko = "", nrTelefonu = "", email = "", adres = "";
+};
+
+void dodajPrzyjaciela(vector <Przyjaciel> &przyjaciele) {
+
+    Przyjaciel nowyPrzyjaciel;
+    string imie = "", nazwisko = "", nrTelefonu = "", email = "", adres = "";
+    fstream plikKsiazki;
+
+    //Pobranie danych nowego przyjaciela
+
+    system("cls");
+
+    cout << "Dodawanie danych Przyjaciela" << endl << endl;
+
+    cout << "Podaj imie przyjaciela: ";
+    cin.sync();
+    getline(cin, imie);
+
+    cout << "Podaj nazwisko przyjaciela: ";
+    cin.sync();
+    getline(cin, nazwisko);
+
+    cout << "Podaj numer telefonu przyjaciela: ";
+    cin.sync();
+    getline(cin, nrTelefonu);
+
+    cout << "Podaj email przyjaciela: ";
+    cin.sync();
+    getline(cin, email);
+
+    cout << "Podaj adres przyjaciela: ";
+    cin.sync();
+    getline(cin, adres);
+
+    //Nadanie identyfikatora przyjacielowi
+
+    int id;
+    if (przyjaciele.size() == 0) {
+        id = 1;
+    } else {
+        int ostatniaPozycja = przyjaciele.size()-1;
+        id = przyjaciele[ostatniaPozycja].idPrzyjaciela;
+        id++;
+
+    }
+    //Dodanie przyjaciela do wektora przyjaciol
+
+    nowyPrzyjaciel.idPrzyjaciela = id;
+
+    nowyPrzyjaciel.imie = imie;
+
+    nowyPrzyjaciel.nazwisko = nazwisko;
+
+    nowyPrzyjaciel.nrTelefonu = nrTelefonu;
+
+    nowyPrzyjaciel.email = email;
+
+    nowyPrzyjaciel.adres = adres;
+
+    przyjaciele.push_back(nowyPrzyjaciel);
+
+    // Dodanie danych przyjaciela do pliku .txt
+
+    plikKsiazki.open("ksiazkaAdresowa.txt", ios::out | ios::app);
+
+    plikKsiazki << id << "|" << imie << "|" << nazwisko << "|" << nrTelefonu << "|" << email << "|" << adres << "|" << endl;
+
+    plikKsiazki.close();
+}
+
+void wczytajOsobyZPliku(vector <Przyjaciel> &przyjaciele) {
+
+    Przyjaciel nowyPrzyjaciel;
+    fstream plikKsiazki;
+    string czescLini = "";
+    char znak = '|';
+    int liczbaZnakow = 0;
+
+    plikKsiazki.open("ksiazkaAdresowa.txt", ios::in);
+
+    if (plikKsiazki.good() == false) {
+        cout << "Nie istnieje plik ksiazki adresowej." << endl;
+    } else {
+        while( getline(plikKsiazki, czescLini,znak)) {
+
+            switch(liczbaZnakow) {
+            case 0:
+                nowyPrzyjaciel.idPrzyjaciela = atoi(czescLini.c_str());
+                break;
+            case 1:
+                nowyPrzyjaciel.imie = czescLini;
+                break;
+            case 2:
+                nowyPrzyjaciel.nazwisko = czescLini;
+                break;
+            case 3:
+                nowyPrzyjaciel.nrTelefonu = czescLini;
+                break;
+            case 4:
+                nowyPrzyjaciel.email = czescLini;
+                break;
+            case 5:
+                nowyPrzyjaciel.adres = czescLini;
+                break;
+            }
+
+            if (liczbaZnakow == 5) {
+
+                przyjaciele.push_back(nowyPrzyjaciel);
+
+                liczbaZnakow = 0;
+
+            } else {
+
+                liczbaZnakow++;
+            }
+        }
+    }
+    plikKsiazki.close();
+}
+
+
+void wypiszDane (vector <Przyjaciel> przyjaciele, int nrPozycjiPrzyjacielaWVektorze) {
+    cout << "Id: " << przyjaciele[nrPozycjiPrzyjacielaWVektorze].idPrzyjaciela << endl;
+    cout << "Imie: " << przyjaciele[nrPozycjiPrzyjacielaWVektorze].imie << endl;
+    cout << "Nazwisko: " << przyjaciele[nrPozycjiPrzyjacielaWVektorze].nazwisko << endl;
+    cout << "Numer telefonu: " << przyjaciele[nrPozycjiPrzyjacielaWVektorze].nrTelefonu << endl;
+    cout << "Email: " << przyjaciele[nrPozycjiPrzyjacielaWVektorze].email << endl;
+    cout << "Adres: " << przyjaciele[nrPozycjiPrzyjacielaWVektorze].adres << endl;
+}
+
+void wypiszDaneWszystkichPrzyjaciol(vector <Przyjaciel> przyjaciele) {
+    for ( int i = 0; i < przyjaciele.size(); i++ ) {
+        wypiszDane(przyjaciele, i);
+    }
+}
+
+void wypiszDaneWszystkichPrzyjaciolOPodanymImieniu(vector <Przyjaciel> przyjaciele, string SzukaneImie) {
+    int CzyJestTakieImie=0;
+    for ( int i = 0; i < przyjaciele.size(); i++ ) {
+        if (przyjaciele[i].imie == SzukaneImie) {
+            wypiszDane(przyjaciele, i);
+            CzyJestTakieImie++;
+        }
+    }
+    if (CzyJestTakieImie == 0) {
+        cout << "Nie zostaly wprowadzone dane przyjaciela o takim imieniu." << endl;
+    }
+}
+
+void wypiszDaneWszystkichPrzyjaciolOPodanymNazwisku(vector <Przyjaciel> przyjaciele, string SzukaneNazwisko) {
+    int CzyJestTakieNazwisko=0;
+    for ( int i = 0; i < przyjaciele.size(); i++ ) {
+        if (przyjaciele[i].nazwisko == SzukaneNazwisko) {
+            wypiszDane(przyjaciele, i);
+            CzyJestTakieNazwisko++;
+        }
+    }
+    if (CzyJestTakieNazwisko == 0) {
+        cout << "Nie zostaly wprowadzone dane przyjaciela o takim nazwisku." << endl;
+    }
+}
+
+void zapiszZmianyWpliku (vector <Przyjaciel> &przyjaciele) {
+
+    fstream plikKsiazki;
+
+    plikKsiazki.open("ksiazkaAdresowa.txt", ios::out | ios::trunc);
+
+    for ( int nrPozycjiWVektorze = 0; nrPozycjiWVektorze < przyjaciele.size(); nrPozycjiWVektorze++ ) {
+
+        plikKsiazki << przyjaciele[nrPozycjiWVektorze].idPrzyjaciela << "|"
+                    << przyjaciele[nrPozycjiWVektorze].imie << "|"
+                    << przyjaciele[nrPozycjiWVektorze].nazwisko << "|"
+                    << przyjaciele[nrPozycjiWVektorze].nrTelefonu << "|"
+                    << przyjaciele[nrPozycjiWVektorze].email << "|"
+                    << przyjaciele[nrPozycjiWVektorze].adres << "|" << endl;
+    }
+
+    plikKsiazki.close();
+}
+
+void usunDanePrzyjaciela(vector <Przyjaciel> &przyjaciele) {
+
+    const char znakPotwierdzenia = 't';
+    char znakWczytany;
+    int id, nrPozycjiWVektorze = 0;
+    bool czySaDaneDlaDanegoId = false;
+
+    cout << "Podaj numer id przyjaciela, ktorego dane chcesz usunac:";
+    cin >> id;
+
+    for (int i = 0; i < przyjaciele.size(); i++) {
+        if (id == przyjaciele[i].idPrzyjaciela) {
+            czySaDaneDlaDanegoId = true;
+            nrPozycjiWVektorze = i;
+        }
+    }
+
+    if ( czySaDaneDlaDanegoId == true) {
+        cout << endl << "Dane ktore chcesz usunac:" << endl;
+        wypiszDane(przyjaciele, nrPozycjiWVektorze);
+
+        cout << endl << "Jesli na pewno chcesz usunac dane tego przyjaciela wcisnij klawisz 't' i potwierdz wybor enterem." << endl;
+        cout << "Jesli nie chcesz usunac danych tego przyjaciela wcisnij dowolny klawisz inny niz 't'." << endl;
+        cin >> znakWczytany;
+
+        if (znakWczytany == znakPotwierdzenia) {
+
+            przyjaciele.erase(przyjaciele.begin()+ nrPozycjiWVektorze);
+
+            zapiszZmianyWpliku(przyjaciele);
+
+            cout << "Dane przyjaciela zostaly usuniete." << endl;
+        } else {
+
+            cout << "Dane przyjaciela nie zostaly usuniete." << endl;
+        }
+    } else {
+        cout << "Nie ma danych dla podanego numeru id." << endl;
+    }
+}
+
+void edytujDanePrzyjaciela(vector <Przyjaciel> &przyjaciele) {
+
+    int id, nrPozycjiWVektorze = 0;
+    bool czySaDaneDlaDanegoId = false;
+
+    cout << "Podaj numer id przyjaciela, ktorego dane chcesz edutowac:";
+    cin >> id;
+
+    for (int i = 0; i < przyjaciele.size(); i++) {
+        if (id == przyjaciele[i].idPrzyjaciela) {
+            czySaDaneDlaDanegoId = true;
+            nrPozycjiWVektorze = i;
+        }
+    }
+
+    if ( czySaDaneDlaDanegoId == true) {
+        cout << endl << "Dane ktore chcesz edytowac:" << endl;
+        wypiszDane(przyjaciele, nrPozycjiWVektorze);
+        system("pause");
+
+        char opcja;
+        bool wyjdz = false;
+
+        while(wyjdz == false) {
+            system("cls");
+
+            cout << "Wybierz co zmienic" << endl << endl;
+            cout << "1. Imie." << endl;
+            cout << "2. Nazwisko." << endl;
+            cout << "3. Numer telefonu." << endl;
+            cout << "4. Email." << endl;
+            cout << "5. Adres." << endl;
+            cout << "6. Powrot do menu glownego." << endl;
+            cin >> opcja;
+
+            string zmiana = "";
+
+            switch(opcja) {
+            case '1': {
+                system("cls");
+                cout << "Podaj nowe imie:";
+                cin.sync();
+                getline(cin, zmiana);
+                przyjaciele[nrPozycjiWVektorze].imie = zmiana;
+                zapiszZmianyWpliku(przyjaciele);
+                system("pause");
+            }
+            break;
+            case '2': {
+                system("cls");
+                cout << "Podaj nowe nazwisko:";
+                cin.sync();
+                getline(cin, zmiana);
+                przyjaciele[nrPozycjiWVektorze].nazwisko = zmiana;
+                zapiszZmianyWpliku(przyjaciele);
+                system("pause");
+            }
+            break;
+            case '3': {
+                system("cls");
+                cout << "Podaj nowy numer telefonu:";
+                cin.sync();
+                getline(cin, zmiana);
+                przyjaciele[nrPozycjiWVektorze].nrTelefonu = zmiana;
+                zapiszZmianyWpliku(przyjaciele);
+                system("pause");
+            }
+            break;
+            case '4': {
+                system("cls");
+                cout << "Podaj nowy email:";
+                cin.sync();
+                getline(cin, zmiana);
+                przyjaciele[nrPozycjiWVektorze].email = zmiana;
+                zapiszZmianyWpliku(przyjaciele);
+                system("pause");
+            }
+            break;
+            case '5': {
+                system("cls");
+                cout << "Podaj nowy adres:";
+                cin.sync();
+                getline(cin, zmiana);
+                przyjaciele[nrPozycjiWVektorze].adres = zmiana;
+                zapiszZmianyWpliku(przyjaciele);
+                system("pause");
+            }
+            break;
+            case '6': {
+                wyjdz = true;
+            }
+            break;
+            default: {
+                cout << "Nie ma takiej opcji" << endl;
+                system("pause");
+            }
+            break;
+            }
+        }
+    }
+}
+
+int main() {
+
+    vector <Przyjaciel> przyjaciele;
+    string wyrazenieDoZnalezieniaWKsiazce = "";
+    wczytajOsobyZPliku(przyjaciele);
+
+    while (1) {
+        char opcja;
+
+        system("cls");
+
+        cout << "KSIAZKA ADRESOWA" << endl << endl;
+        cout << "1. Dodaj dane przyjaciela." << endl;
+        cout << "2. Znajdz dane przyjaciela." << endl;
+        cout << "3. Wyswietl dane wszystkich przyjaciol." << endl;
+        cout << "4. Usun dane przyjaciela." << endl;
+        cout << "5. Edutuj dane przyjaciela." << endl;
+        cout << "9. Zakoncz program." << endl;
+        cin >> opcja;
+
+        switch(opcja) {
+        case '1': {
+            system("cls");
+            dodajPrzyjaciela(przyjaciele);
+            system("pause");
+        }
+        break;
+        case '2': {
+            system("cls");
+
+            cout << "KSIAZKA ADRESOWA" << endl << endl;
+            cout << "1. Szukaj wedlug imienia." << endl;
+            cout << "2. Szukaj wedlug nazwiska." << endl;
+            cin >> opcja;
+
+            switch(opcja) {
+            case '1': {
+                system("cls");
+                cout << "Uwaga! Wyszukiwanie bierze pod uwage wielkosc liter" << endl << endl;
+                cout << "Podaj imie jakie chcesz wyszukac: ";
+                cin.sync();
+                getline(cin, wyrazenieDoZnalezieniaWKsiazce);
+
+                wypiszDaneWszystkichPrzyjaciolOPodanymImieniu(przyjaciele, wyrazenieDoZnalezieniaWKsiazce);
+                system("pause");
+            }
+            break;
+            case '2': {
+                system("cls");
+                cout << "Uwaga! Wyszukiwanie bierze pod uwage wielkosc liter" << endl << endl;
+                cout << "Podaj nazwisko jakie chcesz wyszukac: ";
+                cin.sync();
+                getline(cin, wyrazenieDoZnalezieniaWKsiazce);
+
+                wypiszDaneWszystkichPrzyjaciolOPodanymNazwisku(przyjaciele, wyrazenieDoZnalezieniaWKsiazce);
+                system("pause");
+            }
+            break;
+            }
+        }
+        break;
+        case '3': {
+            system("cls");
+
+            if (przyjaciele.size() == 0) {
+                cout << "Nie masz jeszcze przyjaciol w ksiazce adresowej." << endl;
+            } else {
+                wypiszDaneWszystkichPrzyjaciol(przyjaciele);
+            }
+            system("pause");
+        }
+        break;
+        case '4': {
+            system("cls");
+            usunDanePrzyjaciela(przyjaciele);
+            system("pause");
+        }
+        break;
+        case '5': {
+            system("cls");
+            edytujDanePrzyjaciela(przyjaciele);
+        }
+        break;
+        case '9': {
+            exit(0);
+        }
+        break;
+        default: {
+            cout << "Nie ma takiej opcji" << endl;
+            system("pause");
+        }
+        break;
+        }
+    }
+
+    return 0;
+}
