@@ -237,7 +237,7 @@ void zapiszZmianyWpliku (vector <Przyjaciel> &przyjaciele, int id) {
     plikKsiazki.open("ksiazkaAdresowa.txt", ios::in);
     nowyPlikKsiazki.open("TymczasowaKsiazkaAdresowa.txt", ios::out | ios::trunc);
 
-    while( getline(plikKsiazki, czescLini, znak)) {
+    while (getline(plikKsiazki, czescLini, znak)) {
 
         switch(liczbaZnakow) {
         case 0:
@@ -263,24 +263,33 @@ void zapiszZmianyWpliku (vector <Przyjaciel> &przyjaciele, int id) {
             break;
         }
 
-        if (liczbaZnakow == 6) {
+        if ( liczbaZnakow == 6 ) {
 
-            if (id == Przyjaciel.idPrzyjaciela) {
+            liczbaZnakow = 0;
+
+            if(Przyjaciel.idPrzyjaciela == id) {
 
                 int nrPozycjiWVektorze = 0;
+                bool czyPrzyjacielIstnieje = false;
+
                 for (int i = 0; i < przyjaciele.size(); i++) {
                     if (id == przyjaciele[i].idPrzyjaciela) {
                         nrPozycjiWVektorze = i;
+                        czyPrzyjacielIstnieje = true;
                     }
                 }
 
-                nowyPlikKsiazki << przyjaciele[nrPozycjiWVektorze].idPrzyjaciela << "|"
-                                << przyjaciele[nrPozycjiWVektorze].idUzytkownika << "|"
-                                << przyjaciele[nrPozycjiWVektorze].imie << "|"
-                                << przyjaciele[nrPozycjiWVektorze].nazwisko << "|"
-                                << przyjaciele[nrPozycjiWVektorze].nrTelefonu << "|"
-                                << przyjaciele[nrPozycjiWVektorze].email << "|"
-                                << przyjaciele[nrPozycjiWVektorze].adres << "|" << endl;
+                if (czyPrzyjacielIstnieje == true) {
+                    nowyPlikKsiazki << przyjaciele[nrPozycjiWVektorze].idPrzyjaciela << "|"
+                                    << przyjaciele[nrPozycjiWVektorze].idUzytkownika << "|"
+                                    << przyjaciele[nrPozycjiWVektorze].imie << "|"
+                                    << przyjaciele[nrPozycjiWVektorze].nazwisko << "|"
+                                    << przyjaciele[nrPozycjiWVektorze].nrTelefonu << "|"
+                                    << przyjaciele[nrPozycjiWVektorze].email << "|"
+                                    << przyjaciele[nrPozycjiWVektorze].adres << "|" << endl;
+                } else {
+                    cout << "Dane usuniete";
+                }
 
             } else {
 
@@ -293,17 +302,31 @@ void zapiszZmianyWpliku (vector <Przyjaciel> &przyjaciele, int id) {
                                 << Przyjaciel.adres << "|" << endl;
 
             }
-
-            liczbaZnakow = 0;
-
         } else {
 
             liczbaZnakow++;
         }
 
-        plikKsiazki.close();
-        nowyPlikKsiazki.close();
     }
+
+    plikKsiazki.close();
+    nowyPlikKsiazki.close();
+
+    //Usuniecie niezmienionej ksiazki
+    if( remove( "ksiazkaAdresowa.txt" ) != 0 )
+        perror( "Error deleting file" );
+    else
+        puts( "File successfully deleted" );
+
+    //Zmiana nazwy tymczasowej ksiazki na glowna ksiazke
+    int result;
+    char oldname[] ="TymczasowaKsiazkaAdresowa.txt";
+    char newname[] ="ksiazkaAdresowa.txt";
+    result= rename( oldname, newname );
+    if ( result == 0 )
+        puts ( "File successfully renamed" );
+    else
+        perror( "Error renaming file" );
 }
 
 void zapiszZmianyWplikuUzytkownikow (vector <Uzytkownik> &uzytkownicy) {
@@ -353,7 +376,6 @@ void usunDanePrzyjaciela(vector <Przyjaciel> &przyjaciele) {
 
             zapiszZmianyWpliku(przyjaciele, id);
 
-            cout << "Dane przyjaciela zostaly usuniete." << endl;
         } else {
 
             cout << "Dane przyjaciela nie zostaly usuniete." << endl;
